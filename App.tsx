@@ -1,40 +1,147 @@
-import React from 'react';
-import { Text, View } from 'react-native'
-import { NavigationContainer } from '@react-navigation/native'
+import React, { useEffect, useRef } from 'react';
+import { BackHandler, Text, ToastAndroid, TouchableOpacity, View } from 'react-native'
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
-import { UserSchema } from './src/models/UserSchema';
-import { EventSchema } from './src/models/EventSchema';
-import { RealmProvider } from '@realm/react';
-import { AUTH_SCREEN, HOME_SCREEN, LOGIN_SCREEN, POST_DETAIL_SCREEN, POSTS_SCREEN, REMINDER_FORM_SCREEN } from './src/constants/constant';
-import AuthScreen from './src/screens/AuthScreen';
+import { HOME_SCREEN, HOME_TAB_TRACK, LOGIN_SCREEN, POST_DETAIL_SCREEN, POSTS_SCREEN, PROFILE_SCREEN, CALENDER_SCREEN, CATEGORY_SCREEN, FAVORITE_SCREEN, ABOUTE_SCREEN } from './src/constants/constant';
 import PostListScreen from './src/screens/PostListScreen';
-import { PostSchema } from './src/models/PostSchema';
-import { PostDetailSchema } from './src/models/PostDetailSchema';
 import PostDetailScreen from './src/screens/PostDetailScreen';
 import ReminderFormScreen from './src/screens/ReminderFormScreen';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { DrawerLayout } from 'react-native-gesture-handler';
+import { useAuth } from './src/context/AuthContext';
 
 function App(): React.JSX.Element {
 
   const Stack = createNativeStackNavigator();
+  const Tab = createBottomTabNavigator()
+  const drawerRef = useRef(null);
+  const {isLogin} = useAuth()
+
+
+  const ProfileScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Profile</Text></View>) }
+  const CategoryScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Category</Text></View>) }
+  const FavoriteScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Favorite</Text></View>) }
+  const AboutScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>About</Text></View>) }
+
+  const HomeTab = () => {
+    return (
+      <Stack.Navigator initialRouteName={HOME_SCREEN}>
+        <Stack.Screen name={HOME_SCREEN} component={HomeScreen} options={{ headerShown: false }} />
+        <Stack.Screen name={POSTS_SCREEN} component={PostListScreen} options={{ headerShown: false }} />
+        <Stack.Screen name={POST_DETAIL_SCREEN} component={PostDetailScreen} options={{ headerShown: false }} />
+        <Stack.Screen name={CALENDER_SCREEN} component={ReminderFormScreen} options={{ headerShown: false }} />
+      
+        <Stack.Screen name={CATEGORY_SCREEN} component={CategoryScreen} options={{ headerShown: false }} />
+        <Stack.Screen name={FAVORITE_SCREEN} component={FavoriteScreen} options={{ headerShown: false }} />
+        <Stack.Screen name={ABOUTE_SCREEN} component={AboutScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    )
+  }
+
+
+  const DrawerContent = () => {
+    return (
+      <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Drawer Content</Text>
+      </View>
+    )
+  }
+  const MenuTabButton = () => (
+    <TouchableOpacity
+      onPress={() => drawerRef.current?.openDrawer()}
+      style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+    >
+      <Text style={{ fontSize: 24 }}>☰</Text>
+    </TouchableOpacity>
+  );
+  const MenuTab = () => {
+    // return null because this tab doesn't show a screen
+    return null;
+  };
+
+
+  const navigationRef = useNavigationContainerRef();
+  const lastBackPressTime = useRef(0);
+
+  const backAction = () => {
+    const currentRoute = navigationRef.getCurrentRoute();
+
+
+    if (currentRoute?.name == CALENDER_SCREEN || currentRoute?.name == PROFILE_SCREEN) {
+         navigationRef.navigate(HOME_TAB_TRACK);
+      return true; // prevent default
+    }else if (currentRoute?.name == LOGIN_SCREEN) {
+         const now = Date.now();
+      if (now - lastBackPressTime.current < 2000) {
+        BackHandler.exitApp();
+        return true;
+      } else {
+        ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
+        lastBackPressTime.current = now;
+        return true;
+      }
+    } else if (currentRoute?.name != HOME_SCREEN) {
+        navigationRef.goBack();
+      return true; 
+    } else {
+      const now = Date.now();
+      if (now - lastBackPressTime.current < 2000) {
+        BackHandler.exitApp();
+        return true;
+      } else {
+        ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
+        lastBackPressTime.current = now;
+        return true;
+      }
+    }
+  };
+
+  useEffect(() => {
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove();
+  }, [navigationRef]);
 
   return (
 
-    <RealmProvider schema={[UserSchema, EventSchema, PostSchema, PostDetailSchema]} schemaVersion={1.0}>
+    <NavigationContainer ref={navigationRef}>
 
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName= {AUTH_SCREEN}>
-          <Stack.Screen name={AUTH_SCREEN} component={AuthScreen} options={{headerShown : false}}/>
-          <Stack.Screen name={LOGIN_SCREEN} component={LoginScreen} options={{headerShown:false}}/>
-          <Stack.Screen name={HOME_SCREEN} component={HomeScreen} options={{headerShown:false}} />
-          <Stack.Screen name={POSTS_SCREEN} component={PostListScreen} options={{headerShown :false}} />
-          <Stack.Screen name= {POST_DETAIL_SCREEN} component = {PostDetailScreen} options={{headerShown:false}} />
-          <Stack.Screen name= {REMINDER_FORM_SCREEN} component={ReminderFormScreen} options={{headerShown : false}}/>
-        </Stack.Navigator>
-      </NavigationContainer>
+      {isLogin
+        ? (
+          <DrawerLayout
+            ref={drawerRef}
+            drawerWidth={250}
+            drawerPosition="left"
+            drawerType="front"
+            renderNavigationView={DrawerContent}
+          >
 
-    </RealmProvider>
+            <Tab.Navigator initialRouteName= {HOME_TAB_TRACK}>
+              <Tab.Screen
+                name="Menu"
+                component={MenuTab}
+                options={{
+                  tabBarLabel: '',
+                  tabBarButton: () => <MenuTabButton />,
+                }}
+              />
+              <Tab.Screen name={HOME_TAB_TRACK} component={HomeTab} options={{ headerShown: false }} />
+              <Tab.Screen name={CALENDER_SCREEN} component={ReminderFormScreen} options={{ headerShown: false }} />
+              <Tab.Screen name={PROFILE_SCREEN} component={ProfileScreen} options={{ headerShown: false }} />
+            </Tab.Navigator>
+          </DrawerLayout>
+        )
+        :
+        (
+          <Stack.Navigator initialRouteName={LOGIN_SCREEN}>
+            <Stack.Screen name={LOGIN_SCREEN} component={LoginScreen} options={{ headerShown: false }} />
+          </Stack.Navigator>
+        )}
+
+    </NavigationContainer>
 
 
   );

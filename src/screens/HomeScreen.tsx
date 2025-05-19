@@ -2,11 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { FlatList, View, Text, Button, Modal, TextInput, Alert, Image, Pressable, TouchableOpacity } from "react-native";
-import { LOGIN_SCREEN, POSTS_SCREEN, REMINDER_FORM_SCREEN, TBL_EVENT, TBL_USER } from "../constants/constant";
+import { CALENDER_SCREEN, LOGIN_SCREEN, POSTS_SCREEN, TBL_EVENT, TBL_USER } from "../constants/constant";
 import { useQuery, useRealm } from "@realm/react";
 import { EventSchema } from "../models/EventSchema";
 import { generateUniqId } from "../utils/appUtils";
 import myStyles from "../../myStyles";
+import { useAuth } from "../context/AuthContext";
 
 function HomeScreen({ route }: any): React.JSX.Element {
 
@@ -41,7 +42,7 @@ function HomeScreen({ route }: any): React.JSX.Element {
 
                 <Text style={{ fontSize: 24 }} numberOfLines={1} ellipsizeMode="tail">My Events</Text>
 
-                <TouchableOpacity onPress={() => { navigation.navigate(REMINDER_FORM_SCREEN) }}>
+                <TouchableOpacity onPress={() => { navigation.navigate(CALENDER_SCREEN) }}>
                     <Image source={require('../assets/icons/ic_calender.png')} style={{ height: 35, width: 35, marginRight: 10 }} />
                 </TouchableOpacity>
 
@@ -172,6 +173,7 @@ function ProfileModalView(props) {
     const [mobile, setMobile] = useState('')
     const realm = useRealm()
     const navigation = useNavigation();
+    const {setIsLogin} = useAuth()
 
     useEffect(() => {
         const user = realm.objectForPrimaryKey(TBL_USER, props.userID)
@@ -199,8 +201,9 @@ function ProfileModalView(props) {
                 {
                     text: 'Logout',
                     onPress: async () => {
+                        setIsLogin(false)
                         await AsyncStorage.clear()
-                        navigation.replace(LOGIN_SCREEN)
+                        //navigation.replace(LOGIN_SCREEN)
                     }
                 },
                 {

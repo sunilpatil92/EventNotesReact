@@ -6,6 +6,7 @@ import { UserSchema } from "../models/UserSchema";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TBL_USER, HOME_SCREEN } from "../constants/constant";
 import { generateUniqId } from "../utils/appUtils";
+import { useAuth } from "../context/AuthContext";
 
 
 function LoginScreen(): React.JSX.Element {
@@ -15,20 +16,21 @@ function LoginScreen(): React.JSX.Element {
     const usersData = useQuery(UserSchema)
     const [mobile, setMobile] = useState('')
     const [otp, setOtp] = useState('')
+    const {setIsLogin} = useAuth()
 
 
-    const handleUserAuth = async() => {
+    const handleUserAuth = async () => {
         try {
-            if(mobile.length != 10){
-                Alert.alert('Alert !!','please enter valid mobile number')
+            if (mobile.length != 10) {
+                Alert.alert('Alert !!', 'please enter valid mobile number')
                 return
             }
-            if(otp.length <= 0){
-                Alert.alert('Alert !!','please enter OTP')
+            if (otp.length <= 0) {
+                Alert.alert('Alert !!', 'please enter OTP')
                 return
             }
-            
-            let userId = generateUniqId(realm,UserSchema)
+
+            let userId = generateUniqId(realm, UserSchema)
             const cur_time = Date.now();
             //console.error(userId, cur_time)
 
@@ -36,14 +38,14 @@ function LoginScreen(): React.JSX.Element {
             //console.error(existUsers[0])
 
 
-            if(existUsers.length <= 0){
+            if (existUsers.length <= 0) {
                 realm.write(() => {
                     realm.create(TBL_USER,
                         {
                             id: userId,
                             mobile: mobile,
-                            name : '',
-                            email : '',
+                            name: '',
+                            email: '',
                             created_on: cur_time
                         }
                     )
@@ -54,12 +56,12 @@ function LoginScreen(): React.JSX.Element {
                 console.error('Old User : ', userId)
             }
 
-            await AsyncStorage.setItem('userId',userId+'')
+            await AsyncStorage.setItem('userId', userId + '')
             setMobile('')
             setOtp('')
-            navigation.replace(HOME_SCREEN, { userId : userId })
+            //navigation.replace('Home', { userId: userId })
+            setIsLogin(true)
 
-            
         } catch (error) {
             Alert.alert('something went wrong in Login', error.message)
         }
@@ -68,23 +70,23 @@ function LoginScreen(): React.JSX.Element {
 
     return (
         <View style={{ flex: 1, justifyContent: 'center', marginHorizontal: 20 }}>
-            <Text style={{alignSelf:'center', fontSize:30, marginVertical : 30}}>Login User</Text>
+            <Text style={{ alignSelf: 'center', fontSize: 30, marginVertical: 30 }}>Login User</Text>
 
             <TextInput
                 placeholder="Enter Mobile"
                 inputMode="tel"
-                value= {mobile}
+                value={mobile}
                 onChangeText={(value) => setMobile(value)}
-                style={styles.inputText}/>
+                style={styles.inputText} />
 
             <TextInput
                 placeholder="Enter OTP"
                 inputMode="numeric"
                 value={otp}
                 onChangeText={(value) => setOtp(value)}
-                style={styles.inputText}/>
+                style={styles.inputText} />
 
-            <View style = {{marginHorizontal:20, marginVertical : 20}}>
+            <View style={{ marginHorizontal: 20, marginVertical: 20 }}>
                 <Button title='Login' onPress={() => {
                     handleUserAuth()
                 }} />
@@ -104,6 +106,6 @@ const styles = StyleSheet.create({
         margin: 10,
         borderRadius: 10,
         fontSize: 18,
-        color : 'black'
+        color: 'black'
     },
 })

@@ -5,7 +5,12 @@ export const LOGIN_SCREEN = 'Login'
 export const HOME_SCREEN = 'Home'
 export const POSTS_SCREEN = 'Posts'
 export const POST_DETAIL_SCREEN = 'PostDetail'
-export const REMINDER_FORM_SCREEN = 'ReminderForm'
+export const CALENDER_SCREEN = 'Calender'
+export const PROFILE_SCREEN = 'Profile' 
+export const HOME_TAB_TRACK = 'HomeTabTrack' 
+export const CATEGORY_SCREEN = 'Category' 
+export const FAVORITE_SCREEN = 'Favorite' 
+export const ABOUTE_SCREEN = 'About' 
 
 
 //Databse Tables
