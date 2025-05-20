@@ -177,17 +177,22 @@ function ModalView(props: any) {
             try {
                 const endDate = new Date(date.getTime() + 30 * 60000); // 30 min duration
                 const calId = await getDefaultWritableCalendarId();
+                //console.error('Writable Calendar ID:', calId);
                 const alarmDate = new Date(date.getTime() - (5 * 60 * 1000)) // 5 minutes before
+                const alarms = Platform.OS == 'ios' 
+                                ? [{ relativeOffset: -5 }]
+                                : [{date: alarmDate.toString()}]
 
                 const eventId = await RNCalendarEvents.saveEvent(
                     title || 'Event Reminder',
-                    {
+                    {  
                         calendarId: calId,
                         startDate: date.toISOString(),
                         endDate: endDate.toISOString(),
-                        alarms: [{ date: alarmDate.toString() }],
+                        alarms,
                         notes: 'Created from Event App',
                         description: desc
+
                     });
 
                 Alert.alert('Success', 'Reminder added to calendar!');
@@ -195,8 +200,10 @@ function ModalView(props: any) {
                 props.setModalV(false)
                 props.loadEvents()
             } catch (error) {
+                //console.log('saveEvent error:', JSON.stringify(error, null, 2));
+                //Alert.alert('Error', 'Failed to create event. See logs for details.');
                 Alert.alert('Error', 'Failed to create event.');
-                //console.error(error);
+               //console.error(error);
             }
         } else {
             Alert.alert('Permission Denied', 'Calendar access is required.');

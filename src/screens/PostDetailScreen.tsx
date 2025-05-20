@@ -61,7 +61,7 @@ function PostDetailScreen({ route }: any): React.JSX.Element {
 
         const result = await check(permissions);
         if (result === RESULTS.GRANTED) return true
-        if (result === RESULTS.DENIED || result === RESULTS.LIMITED) {
+        if (result === RESULTS.UNAVAILABLE ||result === RESULTS.DENIED || result === RESULTS.LIMITED) {
             const reqResult = await request(permissions);
             return reqResult === RESULTS.GRANTED
         }
