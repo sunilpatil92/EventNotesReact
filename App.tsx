@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { BackHandler, Text, ToastAndroid, TouchableOpacity, View } from 'react-native'
+import { BackHandler, Image, Text, ToastAndroid, TouchableOpacity, View } from 'react-native'
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './src/screens/LoginScreen';
@@ -11,16 +11,16 @@ import ReminderFormScreen from './src/screens/ReminderFormScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { DrawerLayout } from 'react-native-gesture-handler';
 import { useAuth } from './src/context/AuthContext';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 function App(): React.JSX.Element {
 
   const Stack = createNativeStackNavigator();
   const Tab = createBottomTabNavigator()
   const drawerRef = useRef(null);
-  const {isLogin} = useAuth()
+  const { isLogin } = useAuth()
 
 
-  const ProfileScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Profile</Text></View>) }
   const CategoryScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Category</Text></View>) }
   const FavoriteScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Favorite</Text></View>) }
   const AboutScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>About</Text></View>) }
@@ -32,7 +32,7 @@ function App(): React.JSX.Element {
         <Stack.Screen name={POSTS_SCREEN} component={PostListScreen} options={{ headerShown: false }} />
         <Stack.Screen name={POST_DETAIL_SCREEN} component={PostDetailScreen} options={{ headerShown: false }} />
         <Stack.Screen name={CALENDER_SCREEN} component={ReminderFormScreen} options={{ headerShown: false }} />
-      
+
         <Stack.Screen name={CATEGORY_SCREEN} component={CategoryScreen} options={{ headerShown: false }} />
         <Stack.Screen name={FAVORITE_SCREEN} component={FavoriteScreen} options={{ headerShown: false }} />
         <Stack.Screen name={ABOUTE_SCREEN} component={AboutScreen} options={{ headerShown: false }} />
@@ -70,10 +70,10 @@ function App(): React.JSX.Element {
 
 
     if (currentRoute?.name == CALENDER_SCREEN || currentRoute?.name == PROFILE_SCREEN) {
-         navigationRef.navigate(HOME_TAB_TRACK);
+      navigationRef.navigate(HOME_TAB_TRACK);
       return true; // prevent default
-    }else if (currentRoute?.name == LOGIN_SCREEN) {
-         const now = Date.now();
+    } else if (currentRoute?.name == LOGIN_SCREEN) {
+      const now = Date.now();
       if (now - lastBackPressTime.current < 2000) {
         BackHandler.exitApp();
         return true;
@@ -83,8 +83,8 @@ function App(): React.JSX.Element {
         return true;
       }
     } else if (currentRoute?.name != HOME_SCREEN) {
-        navigationRef.goBack();
-      return true; 
+      navigationRef.goBack();
+      return true;
     } else {
       const now = Date.now();
       if (now - lastBackPressTime.current < 2000) {
@@ -119,7 +119,7 @@ function App(): React.JSX.Element {
             renderNavigationView={DrawerContent}
           >
 
-            <Tab.Navigator initialRouteName= {HOME_TAB_TRACK}>
+            <Tab.Navigator initialRouteName={HOME_TAB_TRACK}>
               <Tab.Screen
                 name="Menu"
                 component={MenuTab}
@@ -128,9 +128,36 @@ function App(): React.JSX.Element {
                   tabBarButton: () => <MenuTabButton />,
                 }}
               />
-              <Tab.Screen name={HOME_TAB_TRACK} component={HomeTab} options={{ headerShown: false }} />
-              <Tab.Screen name={CALENDER_SCREEN} component={ReminderFormScreen} options={{ headerShown: false }} />
-              <Tab.Screen name={PROFILE_SCREEN} component={ProfileScreen} options={{ headerShown: false }} />
+              <Tab.Screen name={HOME_TAB_TRACK} component={HomeTab}
+                options={{
+                  headerShown: false,
+                  tabBarIcon(props) {
+                    return (
+                      <Image source={require('./src/assets/icons/ic_home.png')} style={{ width: 24, height: 24, tintColor: props.color }} />
+                    );
+                  },
+                }}
+              />
+              <Tab.Screen name={CALENDER_SCREEN} component={ReminderFormScreen}
+                options={{
+                  headerShown: false,
+                  tabBarIcon(props) {
+                    return (
+                      <Image source={require('./src/assets/icons/ic_calender.png')} style={{ width: 24, height: 24, tintColor: props.color }} />
+                    );
+                  },
+                }}
+              />
+              <Tab.Screen name={PROFILE_SCREEN} component={ProfileScreen}
+                options={{
+                  headerShown: false,
+                  tabBarIcon(props) {
+                    return (
+                      <Image source={require('./src/assets/icons/ic_user.png')} style={{ width: 24, height: 24, tintColor: props.color }} />
+                    );
+                  },
+                }}
+              />
             </Tab.Navigator>
           </DrawerLayout>
         )

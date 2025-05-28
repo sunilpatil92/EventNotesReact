@@ -22,7 +22,7 @@ export const AuthProvider = ({ children } : { children : React.ReactNode }) => {
             const saved = await AsyncStorage.getItem('isLogin')
             setIsLoginState(saved === 'true')
         }
-        loadLoginState
+        loadLoginState()
     },[])
 
     const setIsLogin = async (value : boolean) =>{

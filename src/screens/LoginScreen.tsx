@@ -59,7 +59,6 @@ function LoginScreen(): React.JSX.Element {
             await AsyncStorage.setItem('userId', userId + '')
             setMobile('')
             setOtp('')
-            //navigation.replace('Home', { userId: userId })
             setIsLogin(true)
 
         } catch (error) {

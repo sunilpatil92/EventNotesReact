@@ -66,9 +66,6 @@ function ReminderFormScreen(): React.JSX.Element {
         <View style={{ flex: 1 }}>
 
             <View style={{ flexDirection: 'row', height: 70, justifyContent: 'flex-start', alignItems: 'center', padding: 10 }}>
-                <Pressable onPress={() => { navigation.pop() }} >
-                    <Image style={{ width: 30, height: 30, margin: 5 }} source={require('../assets/icons/ic_back.png')} />
-                </Pressable>
                 <Text style={{ fontSize: 24, marginLeft: 20, }} numberOfLines={1} ellipsizeMode="tail">Calendar</Text>
             </View>
 
@@ -117,7 +114,7 @@ function ReminderFormScreen(): React.JSX.Element {
             <Modal visible={isModalV} transparent={true} >
                 <ModalView
                     setModalV={setModalV}
-                    loadEvents = {loadEvents} />
+                    loadEvents={loadEvents} />
             </Modal>
 
         </View >
@@ -179,13 +176,13 @@ function ModalView(props: any) {
                 const calId = await getDefaultWritableCalendarId();
                 //console.error('Writable Calendar ID:', calId);
                 const alarmDate = new Date(date.getTime() - (5 * 60 * 1000)) // 5 minutes before
-                const alarms = Platform.OS == 'ios' 
-                                ? [{ relativeOffset: -5 }]
-                                : [{date: alarmDate.toString()}]
+                const alarms = Platform.OS == 'ios'
+                    ? [{ relativeOffset: -5 }]
+                    : [{ date: alarmDate.toString() }]
 
                 const eventId = await RNCalendarEvents.saveEvent(
                     title || 'Event Reminder',
-                    {  
+                    {
                         calendarId: calId,
                         startDate: date.toISOString(),
                         endDate: endDate.toISOString(),
@@ -203,7 +200,7 @@ function ModalView(props: any) {
                 //console.log('saveEvent error:', JSON.stringify(error, null, 2));
                 //Alert.alert('Error', 'Failed to create event. See logs for details.');
                 Alert.alert('Error', 'Failed to create event.');
-               //console.error(error);
+                //console.error(error);
             }
         } else {
             Alert.alert('Permission Denied', 'Calendar access is required.');
