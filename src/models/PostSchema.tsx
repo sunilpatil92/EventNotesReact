@@ -7,9 +7,13 @@ export class PostSchema extends Object{
        primaryKey : 'id',
        properties : {
            id : 'int',
+           user_id : 'int',
            event_id : 'int',
            post_name : 'string',
-           created_on : 'int'
+           description: 'string?',
+           favorite : 'int?',
+           created_on : 'int?',
+           updated_on : 'int?',
        }
    }
 }

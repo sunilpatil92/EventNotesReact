@@ -8,8 +8,10 @@ export class EventSchema extends Object{
        properties : {
            id : 'int',
            user_id : 'int',
-           event_name : 'string',
-           created_on : 'int'
+           event_name : 'string?',
+           description: 'string?',
+           created_on : 'int?',
+           updated_on : 'int?',
        }
    }
 }

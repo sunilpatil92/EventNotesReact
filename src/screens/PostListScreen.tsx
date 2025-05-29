@@ -8,6 +8,7 @@ import { PostSchema } from "../models/PostSchema";
 import { generateUniqId } from "../utils/appUtils";
 import myStyles from "../../myStyles";
 import { FloatingAction } from "react-native-floating-action";
+import { ModalAddEvent } from "../modals/ModalAddEvent";
 
 
 function PostListScreen({ route }: any): React.JSX.Element {
@@ -16,19 +17,38 @@ function PostListScreen({ route }: any): React.JSX.Element {
     const [eventId, setEventId] = useState(0)
     const postData = useQuery(TBL_POST).filtered('event_id == $0', eventId)
     const [isModalV, setModalV] = useState(false)
+    const [userID, setUserId] = useState(0)
 
     useEffect(() => {
         //console.error(route.params.eventId)
+        getUserID()
         setEventId(route.params.eventId)
     }, [])
 
+    async function getUserID() {
+        const id = await AsyncStorage.getItem('userId')
+        if (id) {
+            setUserId(parseInt(id))
+        }
+    }
+
     return (
         <View style={{ flex: 1 }}>
-            <View style={{ flexDirection: 'row', height: 70, justifyContent: 'flex-start', alignItems: 'center', padding: 10 }}>
-                <Pressable onPress={() => { navigation.pop() }} >
+            <View style={{ flexDirection: 'row', height: 70, padding: 10 }}>
+                <Pressable style = {{flex:1, alignItems : 'flex-start'}} onPress={() => { navigation.pop() }} >
                     <Image style={{ width: 30, height: 30, margin: 5 }} source={require('../assets/icons/ic_back.png')} />
                 </Pressable>
-                <Text style={{ fontSize: 24, marginLeft: 20, }} numberOfLines={1} ellipsizeMode="tail">{route.params.eventName}</Text>
+                <Text style={{ fontSize: 24, marginLeft: 20,flex:1,  alignItems:'center' }} numberOfLines={1} ellipsizeMode="tail">{route.params.eventName}</Text>
+                <Pressable style = {{flex:1, alignItems : 'flex-end'}} onPress={() => {
+                            <Modal visible={isModalV} transparent={true} >
+                                <ModalAddEvent
+                                    userID={userID}
+                                    evebtId={eventId}
+                                    setModalV={setModalV} />
+                                </Modal>
+                 }} >
+                    <Image style={{ width: 30, height: 30, margin: 5 }} source={require('../assets/icons/ic_edit.png')} />
+                </Pressable>
             </View>
 
             {postData && postData.length > 0 ? (

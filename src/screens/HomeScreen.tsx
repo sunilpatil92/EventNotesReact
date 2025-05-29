@@ -7,6 +7,7 @@ import { useQuery, useRealm } from "@realm/react";
 import { EventSchema } from "../models/EventSchema";
 import { generateUniqId } from "../utils/appUtils";
 import myStyles from "../../myStyles";
+import { ModalAddEvent } from "../modals/ModalAddEvent";
 
 function HomeScreen({ route }: any): React.JSX.Element {
 
@@ -27,8 +28,6 @@ function HomeScreen({ route }: any): React.JSX.Element {
             setUserId(parseInt(id))
         }
     }
-
-
 
     return (
         <View style={{ flex: 1 }}>
@@ -67,8 +66,9 @@ function HomeScreen({ route }: any): React.JSX.Element {
             </TouchableOpacity>
 
             <Modal visible={isModalV} transparent={true} >
-                <ModalView
+                <ModalAddEvent
                     userID={userID}
+                    evebtId={0}
                     setModalV={setModalV} />
             </Modal>
 
@@ -104,8 +104,9 @@ function ModalView(props) {
                     id: newId,
                     user_id: props.userID,
                     event_name: title,
-                    created_on: cur_time
-
+                    description : '',
+                    created_on: cur_time,
+                    updated_on: cur_time,
                 })
             props.setModalV(false)
         })

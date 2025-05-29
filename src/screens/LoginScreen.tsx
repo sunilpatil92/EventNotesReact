@@ -46,6 +46,7 @@ function LoginScreen(): React.JSX.Element {
                             mobile: mobile,
                             name: '',
                             email: '',
+                            photo : '',
                             created_on: cur_time
                         }
                     )

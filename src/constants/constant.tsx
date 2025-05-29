@@ -18,6 +18,7 @@ export const TBL_USER = 'user_tbl'
 export const TBL_EVENT = 'event_tbl'
 export const TBL_POST = 'post_tbl'
 export const TBL_POST_DETAILS = 'post_detail_tbl'
+export const TBL_LABEL = 'label_tbl'
 
 //Post Types
 export const PostTypes = {

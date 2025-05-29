@@ -10,6 +10,7 @@ import { TBL_USER } from "../constants/constant";
             mobile : 'string',
             name : 'string',
             email : 'string',
+            photo : 'string',
             created_on : 'int',
         } 
     }
