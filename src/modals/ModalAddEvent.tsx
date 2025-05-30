@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, {useEffect, useState } from "react";
 import { View, Text, Button, TextInput, Image, Pressable } from "react-native";
 import { TBL_EVENT } from "../constants/constant";
 import { useRealm } from "@realm/react";
@@ -9,7 +9,24 @@ import myStyles from "../../myStyles";
 export function ModalAddEvent(props) {
 
     const [eventName, setEventName] = useState('')
+    const [desc, setDesc] = useState('')
     const realm = useRealm()
+
+    
+
+    useEffect(() => {
+        const fetchEventData = async () => {
+              const event = await realm.objectForPrimaryKey(EventSchema, props.eventId);
+                if (event) {
+                   setEventName(event.event_name);
+                   setDesc(event.description);
+                }     
+         };
+
+         if(props.eventId){
+            fetchEventData();
+         }
+    },[])
 
     function addEvent() {
 
@@ -25,16 +42,27 @@ export function ModalAddEvent(props) {
         //console.error(title)
 
         realm.write(() => {
-            realm.create(TBL_EVENT,
+
+            if(props.eventId){
+                const event = realm.objectForPrimaryKey(EventSchema, props.eventId);
+                if (event) {
+                    event.event_name = title;
+                    event.description = desc;
+                    event.updated_on = cur_time;
+                }     
+                
+            }else{
+              realm.create(TBL_EVENT,
                 {
-                    id: newId,
+                    id: (props.eventId) ? props.eventId : newId,
                     user_id: props.userID,
                     event_name: title,
-                    description : '',
+                    description : desc,
                     created_on: cur_time,
                     updated_on: cur_time,
                 })
-            props.setModalV(false)
+            }
+          props.setModalV(false)
         })
     }
 
@@ -58,6 +86,15 @@ export function ModalAddEvent(props) {
                     value={eventName}
                     keyboardType="default"
                     onChangeText={(updValue) => { setEventName(updValue) }} />
+                
+                <Text style={{ fontSize: 12, paddingLeft: 5, marginTop: 10 }}>Description</Text>
+
+                <TextInput
+                    style={myStyles.inputText}
+                    placeholder="Description"
+                    value={desc}
+                    keyboardType="default"
+                    onChangeText={(updValue) => { setDesc(updValue) }} />
 
                 <View style={{ marginVertical: 10, marginHorizontal: 30, marginTop: 30 }}>
                     <Button
@@ -70,3 +107,5 @@ export function ModalAddEvent(props) {
         </View>
     );
 }
+
+

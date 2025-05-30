@@ -35,17 +35,12 @@ function PostListScreen({ route }: any): React.JSX.Element {
     return (
         <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', height: 70, padding: 10 }}>
-                <Pressable style = {{flex:1, alignItems : 'flex-start'}} onPress={() => { navigation.pop() }} >
-                    <Image style={{ width: 30, height: 30, margin: 5 }} source={require('../assets/icons/ic_back.png')} />
+                <Pressable style = {{flex:1, alignItems : 'flex-start',justifyContent:'center'}} onPress={() => { navigation.pop() }} >
+                    <Image style={{ width: 30, height: 30,alignContent:'center' }} source={require('../assets/icons/ic_back.png')} />
                 </Pressable>
-                <Text style={{ fontSize: 24, marginLeft: 20,flex:1,  alignItems:'center' }} numberOfLines={1} ellipsizeMode="tail">{route.params.eventName}</Text>
-                <Pressable style = {{flex:1, alignItems : 'flex-end'}} onPress={() => {
-                            <Modal visible={isModalV} transparent={true} >
-                                <ModalAddEvent
-                                    userID={userID}
-                                    evebtId={eventId}
-                                    setModalV={setModalV} />
-                                </Modal>
+                <Text style={{ fontSize: 24, marginLeft: 20,flex:8,  alignItems:'center', alignSelf:'center'  }} numberOfLines={1} ellipsizeMode="tail">{route.params.eventName}</Text>
+                <Pressable style = {{flex:1, alignItems : 'flex-end',justifyContent:'center'}} onPress={() => {
+                     setModalV(true)       
                  }} >
                     <Image style={{ width: 30, height: 30, margin: 5 }} source={require('../assets/icons/ic_edit.png')} />
                 </Pressable>
@@ -83,6 +78,13 @@ function PostListScreen({ route }: any): React.JSX.Element {
             <Modal visible={isModalV} transparent={true} >
                 <ModalView eventId={eventId}
                     postData={postData}
+                    setModalV={setModalV} />
+            </Modal>
+
+            <Modal visible={isModalV} transparent={true} >
+                <ModalAddEvent
+                    userID={userID}
+                    eventId={eventId}
                     setModalV={setModalV} />
             </Modal>
 
