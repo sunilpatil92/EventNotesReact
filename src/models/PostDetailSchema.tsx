@@ -15,8 +15,6 @@ export class PostDetailSchema extends Object {
             title : 'string',
             file_name : 'string',
             file_path : 'string',
-            label_id : 'int?',    // for category
-            label_name : 'string?',    // for category
             created_on : 'int',
             updated_on : 'int?',
            }

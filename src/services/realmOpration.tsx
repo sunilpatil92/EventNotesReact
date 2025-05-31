@@ -5,7 +5,8 @@ import { PostDetailSchema } from "../models/PostDetailSchema";
 
 //const realm = useRealm()
 
-export const addPostDetail = (realm : Realm, postId: any, pType: number,pTitle: string, fName: string, fPath: string) => {
+export const addPostDetail = (realm : Realm,userId: any, eventId: any, postId: any,
+      pType: number,pTitle: string, fName: string, fPath: string) => { 
 
     const newId = generateUniqId(realm, PostDetailSchema)
     const cur_time = Date.now();
@@ -13,6 +14,8 @@ export const addPostDetail = (realm : Realm, postId: any, pType: number,pTitle: 
     realm.write(() => {
         realm.create(TBL_POST_DETAILS, {
             id: newId,
+            user_id : userId,
+            event_id: eventId,
             post_id: postId,
             type: pType,
             title: pTitle,

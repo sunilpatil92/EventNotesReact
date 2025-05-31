@@ -9,6 +9,8 @@ import { generateUniqId } from "../utils/appUtils";
 import myStyles from "../../myStyles";
 import { FloatingAction } from "react-native-floating-action";
 import { ModalAddEvent } from "../modals/ModalAddEvent";
+import { EventSchema } from "../models/EventSchema";
+import { ModalAddPost } from "../modals/ModalAddPost";
 
 
 function PostListScreen({ route }: any): React.JSX.Element {
@@ -17,13 +19,29 @@ function PostListScreen({ route }: any): React.JSX.Element {
     const [eventId, setEventId] = useState(0)
     const postData = useQuery(TBL_POST).filtered('event_id == $0', eventId)
     const [isModalV, setModalV] = useState(false)
+    const [isEventModalV, setEventModalV] = useState(false)
     const [userID, setUserId] = useState(0)
+    const [eventName, setEventName] = useState('')
+    const realm = useRealm()
 
     useEffect(() => {
         //console.error(route.params.eventId)
+        setEventName(route.params.eventName)
         getUserID()
         setEventId(route.params.eventId)
     }, [])
+
+     useEffect(() => {
+            const fetchEventData = async () => {
+                  const event = await realm.objectForPrimaryKey(EventSchema, route.params.eventId);
+                    if (event) {
+                       setEventName(event.event_name);
+                    }     
+             };
+
+             fetchEventData();
+             
+        },[isModalV])
 
     async function getUserID() {
         const id = await AsyncStorage.getItem('userId')
@@ -38,9 +56,9 @@ function PostListScreen({ route }: any): React.JSX.Element {
                 <Pressable style = {{flex:1, alignItems : 'flex-start',justifyContent:'center'}} onPress={() => { navigation.pop() }} >
                     <Image style={{ width: 30, height: 30,alignContent:'center' }} source={require('../assets/icons/ic_back.png')} />
                 </Pressable>
-                <Text style={{ fontSize: 24, marginLeft: 20,flex:8,  alignItems:'center', alignSelf:'center'  }} numberOfLines={1} ellipsizeMode="tail">{route.params.eventName}</Text>
+                <Text style={{ fontSize: 24, marginLeft: 20,flex:8,  alignItems:'center', alignSelf:'center'  }} numberOfLines={1} ellipsizeMode="tail">{eventName}</Text>
                 <Pressable style = {{flex:1, alignItems : 'flex-end',justifyContent:'center'}} onPress={() => {
-                     setModalV(true)       
+                     setEventModalV(true)       
                  }} >
                     <Image style={{ width: 30, height: 30, margin: 5 }} source={require('../assets/icons/ic_edit.png')} />
                 </Pressable>
@@ -52,7 +70,7 @@ function PostListScreen({ route }: any): React.JSX.Element {
                     renderItem={(item) =>
                         <Pressable onPress={() => {
                             //console.error(item.item.id)
-                            navigation.navigate(POST_DETAIL_SCREEN, { id: item.item.id, name: item.item.post_name })
+                            navigation.navigate(POST_DETAIL_SCREEN, { id: item.item.id, name: item.item.post_name, eventId : eventId })
                         }}>
                             <View style={myStyles.listItem}>
                                 <Text style={{ fontSize: 16 }}>{item.item.post_name}</Text>
@@ -76,16 +94,18 @@ function PostListScreen({ route }: any): React.JSX.Element {
 
 
             <Modal visible={isModalV} transparent={true} >
-                <ModalView eventId={eventId}
-                    postData={postData}
+                <ModalAddPost 
+                    userID={userID}
+                    eventId={eventId}
+                    postId = {0}
                     setModalV={setModalV} />
             </Modal>
 
-            <Modal visible={isModalV} transparent={true} >
+            <Modal visible={isEventModalV} transparent={true} >
                 <ModalAddEvent
                     userID={userID}
                     eventId={eventId}
-                    setModalV={setModalV} />
+                    setModalV={setEventModalV} />
             </Modal>
 
         </View>
@@ -93,67 +113,3 @@ function PostListScreen({ route }: any): React.JSX.Element {
 }
 
 export default PostListScreen;
-
-
-function ModalView(props) {
-
-    const [postName, setPostName] = useState('')
-    const realm = useRealm()
-
-    function addPost() {
-
-        let title = '';
-        const newId = generateUniqId(realm, PostSchema)
-        const cur_time = Date.now();
-        if (postName == '') {
-            title = 'post_' + cur_time;
-            setPostName(title)
-        } else {
-            title = postName
-        }
-
-        realm.write(() => {
-            realm.create(TBL_POST,
-                {
-                    id: newId,
-                    event_id: props.eventId,
-                    post_name: title,
-                    created_on: cur_time
-
-                })
-            props.setModalV(false)
-        })
-    }
-
-    return (
-        <View style={myStyles.modalContainer}>
-            <View style={myStyles.modalView}>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 21 }}>Add Post</Text>
-
-                    <Pressable onPress={() => { props.setModalV(false) }}>
-                        <Image style={{ width: 30, height: 30 }} source={require('../assets/icons/ic_cancel.png')} />
-                    </Pressable>
-
-                </View>
-
-                <Text style={{ fontSize: 12, paddingLeft: 5, marginTop: 10 }}>Event Name</Text>
-                <TextInput
-                    style={myStyles.inputText}
-                    placeholder="Post Name"
-                    value={postName}
-                    keyboardType="default"
-                    onChangeText={(updValue) => { setPostName(updValue) }} />
-
-                <View style={{ marginVertical: 10, marginHorizontal: 30, marginTop: 30 }}>
-                    <Button
-                        title="Add Post"
-                        onPress={() => {
-                            addPost()
-                        }} />
-                </View>
-            </View>
-        </View>
-    );
-}

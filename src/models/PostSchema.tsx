@@ -12,6 +12,8 @@ export class PostSchema extends Object{
            post_name : 'string',
            description: 'string?',
            favorite : 'int?',
+           label_id : 'int?',    // for category
+           label_name : 'string?',    // for category
            created_on : 'int?',
            updated_on : 'int?',
        }

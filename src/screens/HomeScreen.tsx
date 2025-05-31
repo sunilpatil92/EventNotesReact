@@ -1,11 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { FlatList, View, Text, Button, Modal, TextInput, Image, Pressable, TouchableOpacity } from "react-native";
+import { FlatList, View, Text, Modal, Image, Pressable, TouchableOpacity } from "react-native";
 import { POSTS_SCREEN, TBL_EVENT } from "../constants/constant";
 import { useQuery, useRealm } from "@realm/react";
-import { EventSchema } from "../models/EventSchema";
-import { generateUniqId } from "../utils/appUtils";
 import myStyles from "../../myStyles";
 import { ModalAddEvent } from "../modals/ModalAddEvent";
 
@@ -68,7 +66,7 @@ function HomeScreen({ route }: any): React.JSX.Element {
             <Modal visible={isModalV} transparent={true} >
                 <ModalAddEvent
                     userID={userID}
-                    evebtId={0}
+                    eventId={0}
                     setModalV={setModalV} />
             </Modal>
 
@@ -78,69 +76,3 @@ function HomeScreen({ route }: any): React.JSX.Element {
 }
 
 export default HomeScreen;
-
-
-function ModalView(props) {
-
-    const [eventName, setEventName] = useState('')
-    const realm = useRealm()
-
-    function addEvent() {
-
-        let title = '';
-        const newId = generateUniqId(realm, EventSchema)
-        const cur_time = Date.now();
-        if (eventName == '') {
-            title = 'event_' + cur_time;
-            setEventName(title);
-        } else {
-            title = eventName
-        }
-        //console.error(title)
-
-        realm.write(() => {
-            realm.create(TBL_EVENT,
-                {
-                    id: newId,
-                    user_id: props.userID,
-                    event_name: title,
-                    description : '',
-                    created_on: cur_time,
-                    updated_on: cur_time,
-                })
-            props.setModalV(false)
-        })
-    }
-
-    return (
-        <View style={myStyles.modalContainer}>
-            <View style={myStyles.modalView}>
-
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 21 }}>Add Events</Text>
-
-                    <Pressable onPress={() => { props.setModalV(false) }}>
-                        <Image style={{ width: 30, height: 30 }} source={require('../assets/icons/ic_cancel.png')} />
-                    </Pressable>
-
-                </View>
-
-                <Text style={{ fontSize: 12, paddingLeft: 5, marginTop: 10 }}>Event Name</Text>
-                <TextInput
-                    style={myStyles.inputText}
-                    placeholder="Event Name"
-                    value={eventName}
-                    keyboardType="default"
-                    onChangeText={(updValue) => { setEventName(updValue) }} />
-
-                <View style={{ marginVertical: 10, marginHorizontal: 30, marginTop: 30 }}>
-                    <Button
-                        title="Add Event"
-                        onPress={() => {
-                            addEvent()
-                        }} />
-                </View>
-            </View>
-        </View>
-    );
-}

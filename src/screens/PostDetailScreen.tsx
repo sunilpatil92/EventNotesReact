@@ -11,6 +11,9 @@ import RNFS from 'react-native-fs'
 import { PostTypes, TBL_POST_DETAILS } from "../constants/constant";
 import { FloatingAction } from "react-native-floating-action";
 import { addPostDetail, updatePostDetail } from "../services/realmOpration";
+import { ModalAddPost } from "../modals/ModalAddPost";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { PostSchema } from "../models/PostSchema";
 
 const audioRecorderPlayer = new AudioRecorderPlayer()
 
@@ -23,8 +26,12 @@ function PostDetailScreen({ route }: any): React.JSX.Element {
     const [isRecordModalV, setIsRecordModalV] = useState(false)
     const [isTextPostModalV, setIsTextPostModalV] = useState(false)
     const [isUpdateModalV, setIsUpdateModalV] = useState(false)
+    const [isPostModalV, setPostModalV] = useState(false)
     const [imgUri, setImgUri] = useState(null)
     const [selectedItem, setSelectedItem] = useState()
+    const [postName, setPostName] = useState('')
+    const [userID, setUserId] = useState(0)
+    const [eventId, setEventId] = useState(0)
 
     const actions = [
         {
@@ -48,9 +55,30 @@ function PostDetailScreen({ route }: any): React.JSX.Element {
     ]
 
     useEffect(() => {
-        //console.error(route.params.eventId)
+        getUserID()
         setPostId(route.params.id)
+        setPostName(route.params.name)
+        setEventId(route.params.eventId)
     }, [])
+
+    useEffect(() => {
+                const fetchPostData = async () => {
+                      const post = await realm.objectForPrimaryKey(PostSchema, route.params.id);
+                        if (post) {
+                           setPostName(post.post_name);
+                        }     
+                 };
+    
+                 fetchPostData();
+                 
+            },[isPostModalV])
+
+     async function getUserID() {
+        const id = await AsyncStorage.getItem('userId')
+        if (id) {
+            setUserId(parseInt(id))
+        }
+    }
 
 
     const checkcameraPermission = async () => {
@@ -92,6 +120,8 @@ function PostDetailScreen({ route }: any): React.JSX.Element {
                     //console.error(fileName)
                     addPostDetail(
                         realm,
+                        userID,
+                        eventId,
                         postId,
                         PostTypes.PHOTO,
                         'untitle Photo',
@@ -123,11 +153,16 @@ function PostDetailScreen({ route }: any): React.JSX.Element {
     return (
         <View style={{ flex: 1 }}>
 
-            <View style={{ flexDirection: 'row', height: 70, justifyContent: 'flex-start', alignItems: 'center', padding: 10 }}>
-                <Pressable onPress={() => { navigation.pop() }} >
-                    <Image style={{ width: 30, height: 30, margin: 5 }} source={require('../assets/icons/ic_back.png')} />
+            <View style={{ flexDirection: 'row', height: 70, padding: 10 }}>
+                <Pressable style = {{flex:1, alignItems : 'flex-start',justifyContent:'center'}} onPress={() => { navigation.pop() }} >
+                    <Image style={{ width: 30, height: 30,alignContent:'center' }} source={require('../assets/icons/ic_back.png')} />
                 </Pressable>
-                <Text style={{ fontSize: 24, marginLeft: 20, }} numberOfLines={1} ellipsizeMode="tail">{route.params.name}</Text>
+                <Text style={{ fontSize: 24, marginLeft: 20,flex:8,  alignItems:'center', alignSelf:'center'  }} numberOfLines={1} ellipsizeMode="tail">{postName}</Text>
+                <Pressable style = {{flex:1, alignItems : 'flex-end',justifyContent:'center'}} onPress={() => {
+                                    setPostModalV(true)       
+                                }} >
+                    <Image style={{ width: 30, height: 30, margin: 5 }} source={require('../assets/icons/ic_edit.png')} />
+                </Pressable>                     
             </View>
 
             {postDetailData && postDetailData.length > 0 ? (
@@ -202,25 +237,40 @@ function PostDetailScreen({ route }: any): React.JSX.Element {
 
             <Modal visible={isRecordModalV} transparent={true} >
                 <RecordModalView
-                    post_id={postId}
+                    userID={userID}
+                    eventId={eventId}
+                    postId = {postId}
                     setIsRecordModalV={setIsRecordModalV}
                 />
             </Modal>
 
             <Modal visible={isTextPostModalV} transparent={true}>
                 <TextPostModalView
-                    post_id={postId}
+                    userID={userID}
+                    eventId={eventId}
+                    postId = {postId}
                     setIsTextPostModalV={setIsTextPostModalV}
                 />
             </Modal>
 
             <Modal visible={isUpdateModalV} transparent={true}>
                 <UpdateModalView
-                    post_id={postId}
+                    userID={userID}
+                    eventId={eventId}
+                    postId = {postId}
                     post_item={selectedItem}
                     setIsUpdateModalV={setIsUpdateModalV}
                 />
             </Modal>
+
+            <Modal visible={isPostModalV} transparent={true} >
+                <ModalAddPost
+                    userID={userID}
+                    eventId={eventId}
+                    postId = {postId}
+                    setModalV={setPostModalV} />
+            </Modal>               
+                        
         </View>
     );
 }
@@ -285,7 +335,7 @@ function RecordModalView(props) {
         audioRecorderPlayer.removeRecordBackListener();
         setIsRecording(false)
         //console.error('Rec file Path :', result)
-        addPostDetail(realm, props.post_id, PostTypes.AUDIO, 'untitle Audio', fileName, audioPath)
+        addPostDetail(realm, props.userID, props.eventId, props.postId, PostTypes.AUDIO, 'untitle Audio', fileName, audioPath)
         props.setIsRecordModalV(false)
     }
 
@@ -333,7 +383,7 @@ function TextPostModalView(props) {
             Alert.alert('Alert!!', 'please enter your comment.')
             return
         }
-        addPostDetail(realm, props.post_id, PostTypes.TEXT, postText, '', '')
+        addPostDetail(realm, props.userID, props.eventId, props.postId, PostTypes.TEXT, postText, '', '')
         props.setIsTextPostModalV(false)
 
     }

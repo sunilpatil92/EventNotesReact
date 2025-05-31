@@ -11,9 +11,7 @@ export function ModalAddEvent(props) {
     const [eventName, setEventName] = useState('')
     const [desc, setDesc] = useState('')
     const realm = useRealm()
-
     
-
     useEffect(() => {
         const fetchEventData = async () => {
               const event = await realm.objectForPrimaryKey(EventSchema, props.eventId);
@@ -44,6 +42,7 @@ export function ModalAddEvent(props) {
         realm.write(() => {
 
             if(props.eventId){
+                
                 const event = realm.objectForPrimaryKey(EventSchema, props.eventId);
                 if (event) {
                     event.event_name = title;
