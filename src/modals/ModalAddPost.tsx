@@ -11,6 +11,7 @@ export function ModalAddPost(props) {
     const [postName, setPostName] = useState('')
     const [desc, setDesc] = useState('')
     const realm = useRealm()
+    const [favorite, setFavorite] = useState(false)
 
     useEffect(() => {
         const fetchPostData = async () => {
@@ -99,6 +100,20 @@ export function ModalAddPost(props) {
                     value={desc}
                     keyboardType="default"
                     onChangeText={(updValue) => { setDesc(updValue) }} />
+
+                    
+
+                <Pressable onPress={()=>{setFavorite(!favorite)}}>
+                    <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems:'center', marginLeft:10, marginTop:10, marginBottom:10,marginRight:2,}}>
+                        <Text style={{ fontSize: 14, }}>Make your Favorite</Text>
+                        <Image style={{ width: 30, height: 30 }} source={
+                        favorite ? 
+                        require('../assets/icons/ic_favorite.png')
+                        :
+                        require('../assets/icons/ic_unfavorit.png')
+                        } />
+                    </View>
+                </Pressable>
 
                 <View style={{ marginVertical: 10, marginHorizontal: 30, marginTop: 30 }}>
                     <Button
