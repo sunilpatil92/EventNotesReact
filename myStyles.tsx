@@ -5,7 +5,8 @@ export default StyleSheet.create({
         borderColor: 'green',
         borderWidth: 2,
         margin: 3,
-        borderRadius: 10
+        borderRadius: 10,
+        padding:8
     },
     inputTextBig: {
         borderColor: 'green',
@@ -70,5 +71,26 @@ export default StyleSheet.create({
         color:'white',
         backgroundColor:'#1c274c'
     },
+  dropdown: {
+    padding:8,
+    margin:5, 
+    borderWidth:1, 
+    borderColor: 'black', 
+    borderRadius:10
+  },
+  dropDownBoxItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+  },
+  dropDownTextItem: {
+    fontSize: 16,
+    color: '#333',
+  },
+  dropDownFirstTextItem: {
+    color: 'green', // Change this to your desired color
+    fontWeight: 'bold',
+  },
 
 })

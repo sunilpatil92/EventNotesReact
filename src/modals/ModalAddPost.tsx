@@ -5,6 +5,8 @@ import { useRealm } from "@realm/react";
 import { PostSchema } from "../models/PostSchema";
 import { generateUniqId } from "../utils/appUtils";
 import myStyles from "../../myStyles";
+import { Dropdown } from "react-native-element-dropdown";
+import { Icon } from "react-native-vector-icons/Icon";
 
 export function ModalAddPost(props) {
 
@@ -12,6 +14,18 @@ export function ModalAddPost(props) {
     const [desc, setDesc] = useState('')
     const realm = useRealm()
     const [favorite, setFavorite] = useState(false)
+    const [isForUpdate, setForUpdate] = useState(false)
+    const [selectedLable, setLabel] = useState(null)
+    const [isFocus, setIsFocus] = useState(false);
+    const labelData = [
+        {label : 'Add new', value : 'add'},
+        {label : 'Food', value : '1'},
+        {label : 'Party', value : '2'},
+        {label : 'Education', value : '3'},
+        {label : 'Stock', value : '4'},
+        {label : 'Festival', value : '5'},
+        {label : 'Tech', value : '6'},
+    ]
 
     useEffect(() => {
         const fetchPostData = async () => {
@@ -19,6 +33,7 @@ export function ModalAddPost(props) {
             if (post) {
                 setPostName(post.post_name);
                 setDesc(post.description);
+                setForUpdate(true)
             }
         };
 
@@ -72,12 +87,24 @@ export function ModalAddPost(props) {
         })
     }
 
+    const renderItem = (item: { label: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, index: number) => {
+        const isFirst = index === 0;
+        return(
+            <View style={myStyles.dropDownBoxItem}>
+              {isFirst && <Icon name="add" size={18} color="green" style={{ marginRight: 5 }} />}
+                <Text style={[myStyles.dropDownTextItem, isFirst && myStyles.dropDownFirstTextItem]}>
+                {item.label}
+                </Text>
+            </View>
+        )
+    }
+
     return (
         <View style={myStyles.modalContainer}>
             <View style={myStyles.modalView}>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 21 }}>Add Post</Text>
+                    <Text style={{ fontSize: 21 }}>{isForUpdate ? "Update Post" : "Add Post"}</Text>
 
                     <Pressable onPress={() => { props.setModalV(false) }}>
                         <Image style={{ width: 30, height: 30 }} source={require('../assets/icons/ic_cancel.png')} />
@@ -115,9 +142,23 @@ export function ModalAddPost(props) {
                     </View>
                 </Pressable>
 
+                <Text style={{ fontSize: 12, paddingLeft: 5, marginTop: 10 }}>Label</Text>
+                <Dropdown
+                     style = {{padding:8,margin:5, borderWidth:1, borderColor: 'black', borderRadius:10}} 
+                     data={labelData}
+                     value={selectedLable}
+                     onFocus={() => setIsFocus(true)}
+                     onBlur={() => setIsFocus(false)}
+                     onChange={item => { setLabel(item.value); setIsFocus(false) } } 
+                     placeholder={!isFocus ? 'Select item' : '...'}
+                     labelField={"label"} 
+                     valueField={"value"}
+                     renderItem={renderItem} >
+                </Dropdown>
+
                 <View style={{ marginVertical: 10, marginHorizontal: 30, marginTop: 30 }}>
                     <Button
-                        title="Add Post"
+                        title =  {isForUpdate ? "Update Post" : "Add Post"}
                         onPress={() => {
                             addPost()
                         }} />

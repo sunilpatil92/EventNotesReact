@@ -11,6 +11,7 @@ export function ModalAddEvent(props) {
     const [eventName, setEventName] = useState('')
     const [desc, setDesc] = useState('')
     const realm = useRealm()
+     const [isForUpdate, setForUpdate] = useState(false)
     
     useEffect(() => {
         const fetchEventData = async () => {
@@ -18,6 +19,7 @@ export function ModalAddEvent(props) {
                 if (event) {
                    setEventName(event.event_name);
                    setDesc(event.description);
+                   setForUpdate(true)
                 }     
          };
 
@@ -70,7 +72,7 @@ export function ModalAddEvent(props) {
             <View style={myStyles.modalView}>
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Text style={{ fontSize: 21 }}>Add Events</Text>
+                    <Text style={{ fontSize: 21 }}>{isForUpdate ? "Update Event" : "Add Event"}</Text>
 
                     <Pressable onPress={() => { props.setModalV(false) }}>
                         <Image style={{ width: 30, height: 30 }} source={require('../assets/icons/ic_cancel.png')} />
@@ -97,7 +99,7 @@ export function ModalAddEvent(props) {
 
                 <View style={{ marginVertical: 10, marginHorizontal: 30, marginTop: 30 }}>
                     <Button
-                        title="Add Event"
+                        title= {isForUpdate ? "Update Event" : "Add Event"}
                         onPress={() => {
                             addEvent()
                         }} />
