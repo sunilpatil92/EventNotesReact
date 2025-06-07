@@ -6,7 +6,6 @@ import { PostSchema } from "../models/PostSchema";
 import { generateUniqId } from "../utils/appUtils";
 import myStyles from "../../myStyles";
 import { Dropdown } from "react-native-element-dropdown";
-import { Icon } from "react-native-vector-icons/Icon";
 
 export function ModalAddPost(props) {
 
@@ -91,7 +90,7 @@ export function ModalAddPost(props) {
         const isFirst = index === 0;
         return(
             <View style={myStyles.dropDownBoxItem}>
-              {isFirst && <Icon name="add" size={18} color="green" style={{ marginRight: 5 }} />}
+              {isFirst && <Image source={require('../assets/icons/ic_add.png')} style={{ width: 18, height: 18, marginRight: 5 }} />}
                 <Text style={[myStyles.dropDownTextItem, isFirst && myStyles.dropDownFirstTextItem]}>
                 {item.label}
                 </Text>
