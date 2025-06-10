@@ -17,13 +17,10 @@ export function ModalAddPost(props) {
     const [selectedLable, setLabel] = useState(null)
     const [isFocus, setIsFocus] = useState(false);
     const labelData = [
-        {label : 'Add new', value : 'add'},
+        {label : 'Add Label', value : 'add'},
         {label : 'Food', value : '1'},
         {label : 'Party', value : '2'},
-        {label : 'Education', value : '3'},
-        {label : 'Stock', value : '4'},
-        {label : 'Festival', value : '5'},
-        {label : 'Tech', value : '6'},
+       
     ]
 
     useEffect(() => {
@@ -86,16 +83,22 @@ export function ModalAddPost(props) {
         })
     }
 
-    const renderItem = (item: { label: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, index: number) => {
-        const isFirst = index === 0;
-        return(
-            <View style={myStyles.dropDownBoxItem}>
-              {isFirst && <Image source={require('../assets/icons/ic_add.png')} style={{ width: 18, height: 18, marginRight: 5 }} />}
-                <Text style={[myStyles.dropDownTextItem, isFirst && myStyles.dropDownFirstTextItem]}>
-                {item.label}
-                </Text>
+    const renderItem = (item) => {
+        return (
+            <View style={myStyles.dropDownBoxItem}>    
+                {item.value === 'add' && <Image source={require('../assets/icons/ic_add.png')} style={{ width: 24, height: 24, marginRight: 5 }} />}
+                <Text style={myStyles.dropDownTextItem}>{item.label}</Text>
             </View>
-        )
+        );
+    }
+
+    const handleLabelChanges = (item) =>{
+        if (item.value === 'add') {
+            console.log("Add new label");
+        }else {      
+            setLabel(item.value);
+            setIsFocus(false);
+        }
     }
 
     return (
@@ -148,7 +151,7 @@ export function ModalAddPost(props) {
                      value={selectedLable}
                      onFocus={() => setIsFocus(true)}
                      onBlur={() => setIsFocus(false)}
-                     onChange={item => { setLabel(item.value); setIsFocus(false) } } 
+                     onChange={handleLabelChanges } 
                      placeholder={!isFocus ? 'Select item' : '...'}
                      labelField={"label"} 
                      valueField={"value"}
