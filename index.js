@@ -13,11 +13,12 @@ import { PostSchema } from './src/models/PostSchema';
 import { PostDetailSchema } from './src/models/PostDetailSchema';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider } from './src/context/AuthContext';
+import { LabelSchema } from './src/models/LabelSchema';
 
 
 const RealmProviderView = ()=> {
    return(
-      <RealmProvider schema={[UserSchema, EventSchema, PostSchema, PostDetailSchema]} schemaVersion={1.0}>
+      <RealmProvider schema={[UserSchema, EventSchema, PostSchema, PostDetailSchema, LabelSchema]} schemaVersion={1.0}>
         <App />
       </RealmProvider>
    )

@@ -1,29 +1,33 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, Modal, TextInput, Image, Pressable, TouchableOpacity } from "react-native";
-import { TBL_POST } from "../constants/constant";
-import { useRealm } from "@realm/react";
+import { View, Text, Button, Modal, TextInput, Image, Pressable, TouchableOpacity, Alert } from "react-native";
+import { TBL_LABEL, TBL_POST } from "../constants/constant";
+import { useQuery, useRealm } from "@realm/react";
 import { PostSchema } from "../models/PostSchema";
 import { generateUniqId } from "../utils/appUtils";
 import myStyles from "../../myStyles";
 import { Dropdown } from "react-native-element-dropdown";
+import { LabelSchema } from "../models/LabelSchema";
 
 export function ModalAddPost(props) {
 
+    const [userID, setUserId] = useState(null)
     const [postName, setPostName] = useState('')
     const [desc, setDesc] = useState('')
     const realm = useRealm()
     const [favorite, setFavorite] = useState(false)
     const [isForUpdate, setForUpdate] = useState(false)
+    const [selectedLableId, setLabelId] = useState(null)
     const [selectedLable, setLabel] = useState(null)
     const [isFocus, setIsFocus] = useState(false);
+    const labelRoomData = useQuery(TBL_LABEL).filtered('user_id == $0', props.userID);  
     const labelData = [
-        {label : 'Add Label', value : 'add'},
-        {label : 'Food', value : '1'},
-        {label : 'Party', value : '2'},
-       
+        {label : 'Add Label', value : 'add'}
     ]
+    const [isLabelViewVisi,setIsLabelViewVisi] = useState(false)
+    const [labelName, setLabelName] = useState('')
 
     useEffect(() => {
+        setUserId(props.userID)
         const fetchPostData = async () => {
             const post = await realm.objectForPrimaryKey(PostSchema, props.postId);
             if (post) {
@@ -37,6 +41,14 @@ export function ModalAddPost(props) {
             fetchPostData();
         }
     }, [])
+
+    useEffect(() => {
+        if (labelRoomData.length > 0) {
+            labelRoomData.forEach((item) => {
+                labelData.push({ label: item.name, value: item.id })
+            })
+        }
+    }, [labelRoomData])     
 
 
     function addPost() {
@@ -58,8 +70,8 @@ export function ModalAddPost(props) {
                         post.post_name = title;
                         post.description = desc;
                         post.favotite = 0; // default value
-                        post.label_id = 0; // default value   
-                        post.label_name = ''; // default value
+                        post.label_id = selectedLableId; 
+                        post.label_name = selectedLable; 
                         post.updated_on = cur_time;     
                     }
                  
@@ -72,14 +84,31 @@ export function ModalAddPost(props) {
                     post_name: title,
                     description: desc,
                     favotite: 0, // default value
-                    label_id: 0, // default value   
-                    label_name: '', // default value
+                    label_id: selectedLableId,  
+                    label_name: selectedLable, 
                     created_on: cur_time,
                     updated_on: cur_time
                 })
             }
 
             props.setModalV(false)
+        })
+    }
+
+    function addLabelInRoom() {
+        const newId = generateUniqId(realm, LabelSchema)
+        const cur_time = Date.now();
+        if (labelName == '') {
+           return Alert.alert('Please enter label name');
+        }
+
+        realm.write(() => {
+            realm.create(TBL_LABEL, {
+                    id: newId,
+                    user_id: userID,
+                    name: labelName,
+                })
+            setIsLabelViewVisi(false);
         })
     }
 
@@ -94,9 +123,11 @@ export function ModalAddPost(props) {
 
     const handleLabelChanges = (item) =>{
         if (item.value === 'add') {
-            console.log("Add new label");
+            //console.log("Add new label");
+            setIsLabelViewVisi(true);
         }else {      
-            setLabel(item.value);
+            setLabel(item.label);
+            setLabelId(item.value)
             setIsFocus(false);
         }
     }
@@ -105,6 +136,39 @@ export function ModalAddPost(props) {
         <View style={myStyles.modalContainer}>
             <View style={myStyles.modalView}>
 
+            {
+             (isLabelViewVisi) ? (
+
+                <View style={{flexDirection : 'column'}}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Text style={{ fontSize: 21 }}>Add Labels</Text>
+
+                        <Pressable onPress={() => {  setIsLabelViewVisi(false); }}>
+                            <Image style={{ width: 30, height: 30 }} source={require('../assets/icons/ic_cancel.png')} />
+                        </Pressable>
+                    </View>
+
+                    <Text style={{ fontSize: 12, paddingLeft: 5, marginTop: 10 }}>Label Name</Text>
+                    <TextInput
+                        style={myStyles.inputText}
+                        placeholder="Label Name"
+                        value={labelName}
+                        keyboardType="default"
+                        onChangeText={(updValue) => { setLabelName(updValue) }} />
+
+                    <View style={{ marginVertical: 10, marginHorizontal: 30, marginTop: 30 }}>
+                        <Button
+                            title =  'Submit'
+                            onPress={() => {
+                                addLabelInRoom()
+                            }} />
+                    </View>
+                </View>
+
+             ) : 
+             (
+
+              <View style = {{flexDirection:'column'}}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={{ fontSize: 21 }}>{isForUpdate ? "Update Post" : "Add Post"}</Text>
 
@@ -129,8 +193,6 @@ export function ModalAddPost(props) {
                     value={desc}
                     keyboardType="default"
                     onChangeText={(updValue) => { setDesc(updValue) }} />
-
-                    
 
                 <Pressable onPress={()=>{setFavorite(!favorite)}}>
                     <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems:'center', marginLeft:10, marginTop:10, marginBottom:10,marginRight:2,}}>
@@ -165,6 +227,12 @@ export function ModalAddPost(props) {
                             addPost()
                         }} />
                 </View>
+              </View>
+
+             )
+            }
+
+                
             </View>
         </View>
     );
