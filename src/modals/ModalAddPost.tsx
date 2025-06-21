@@ -20,9 +20,7 @@ export function ModalAddPost(props) {
     const [selectedLable, setLabel] = useState(null)
     const [isFocus, setIsFocus] = useState(false);
     const labelRoomData = useQuery(TBL_LABEL).filtered('user_id == $0', props.userID);  
-    const labelData = [
-        {label : 'Add Label', value : 'add'}
-    ]
+    const [labelData, setLabelData] = useState([])
     const [isLabelViewVisi,setIsLabelViewVisi] = useState(false)
     const [labelName, setLabelName] = useState('')
 
@@ -43,13 +41,25 @@ export function ModalAddPost(props) {
     }, [])
 
     useEffect(() => {
+        loadLabelFromRealm();
+        labelRoomData.addListener(loadLabelFromRealm)
+
+        return () =>{ labelRoomData.removeListener(loadLabelFromRealm)}
+    }, [])     
+
+    function loadLabelFromRealm() {
+       let dbLabels =[]
+            dbLabels.push({label : 'Add Label', value : 'add'})
         if (labelRoomData.length > 0) {
+            setIsLabelViewVisi(false);
             labelRoomData.forEach((item) => {
-                labelData.push({ label: item.name, value: item.id })
+                const newItem = {label : item.name, value : item.id}
+                dbLabels.push(newItem)
             })
         }
-    }, [labelRoomData])     
-
+        setLabelData(dbLabels)
+    }
+    
 
     function addPost() {
 
@@ -110,6 +120,7 @@ export function ModalAddPost(props) {
                 })
             setIsLabelViewVisi(false);
         })
+        setLabelName('')
     }
 
     const renderItem = (item) => {
@@ -237,3 +248,4 @@ export function ModalAddPost(props) {
         </View>
     );
 }
+
