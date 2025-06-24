@@ -18,12 +18,20 @@ export function ModalAddPost(props) {
     const [isForUpdate, setForUpdate] = useState(false)
     const [selectedLableId, setLabelId] = useState(null)
     const [selectedLable, setLabel] = useState(null)
+    const [selectedValue, setSelectedValue] = useState(null)
     const [isFocus, setIsFocus] = useState(false);
     const labelRoomData = useQuery(TBL_LABEL).filtered('user_id == $0', props.userID);  
     const [labelData, setLabelData] = useState([])
     const [isLabelViewVisi,setIsLabelViewVisi] = useState(false)
     const [labelName, setLabelName] = useState('')
 
+     useEffect(() => {
+        loadLabelFromRealm();
+        labelRoomData.addListener(loadLabelFromRealm)
+
+        return () =>{ labelRoomData.removeListener(loadLabelFromRealm)}
+    }, [])     
+    
     useEffect(() => {
         setUserId(props.userID)
         const fetchPostData = async () => {
@@ -31,6 +39,10 @@ export function ModalAddPost(props) {
             if (post) {
                 setPostName(post.post_name);
                 setDesc(post.description);
+                setFavorite((post.favotite == 1) ? true : false);
+                setLabelId(post.label_id);
+                setLabel(post.label_name);
+                setSelectedValue(post.label_name);
                 setForUpdate(true)
             }
         };
@@ -39,13 +51,6 @@ export function ModalAddPost(props) {
             fetchPostData();
         }
     }, [])
-
-    useEffect(() => {
-        loadLabelFromRealm();
-        labelRoomData.addListener(loadLabelFromRealm)
-
-        return () =>{ labelRoomData.removeListener(loadLabelFromRealm)}
-    }, [])     
 
     function loadLabelFromRealm() {
        let dbLabels =[]
@@ -75,25 +80,25 @@ export function ModalAddPost(props) {
 
         realm.write(() => {
             if (props.postId) {
+                // Update existing post
                  const post = realm.objectForPrimaryKey(PostSchema, props.postId);
                     if (post) {
                         post.post_name = title;
                         post.description = desc;
-                        post.favotite = 0; // default value
+                        post.favorite = favorite ? 1 : 0;
                         post.label_id = selectedLableId; 
                         post.label_name = selectedLable; 
                         post.updated_on = cur_time;     
                     }
-                 
             }else{
- 
+                // Create a new post
                  realm.create(TBL_POST, {
                     id: newId,
                     user_id: props.userID,
                     event_id: props.eventId,
                     post_name: title,
                     description: desc,
-                    favotite: 0, // default value
+                    favorite: favorite ? 1 : 0,
                     label_id: selectedLableId,  
                     label_name: selectedLable, 
                     created_on: cur_time,
@@ -221,7 +226,7 @@ export function ModalAddPost(props) {
                 <Dropdown
                      style = {{padding:8,margin:5, borderWidth:1, borderColor: 'black', borderRadius:10}} 
                      data={labelData}
-                     value={selectedLable}
+                     value={selectedValue}
                      onFocus={() => setIsFocus(true)}
                      onBlur={() => setIsFocus(false)}
                      onChange={handleLabelChanges } 
