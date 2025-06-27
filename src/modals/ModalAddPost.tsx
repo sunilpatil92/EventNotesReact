@@ -223,10 +223,12 @@ export function ModalAddPost(props) {
                 </Pressable>
 
                 <Text style={{ fontSize: 12, paddingLeft: 5, marginTop: 10 }}>Label</Text>
-                <Dropdown
+                
+                <View style={{flex:1,justifyContent :'center'}}>
+                    <Dropdown
                      style = {{padding:8,margin:5, borderWidth:1, borderColor: 'black', borderRadius:10}} 
                      data={labelData}
-                     value={selectedValue}
+                     value={selectedLable}
                      onFocus={() => setIsFocus(true)}
                      onBlur={() => setIsFocus(false)}
                      onChange={handleLabelChanges } 
@@ -234,7 +236,14 @@ export function ModalAddPost(props) {
                      labelField={"label"} 
                      valueField={"value"}
                      renderItem={renderItem} >
-                </Dropdown>
+                    </Dropdown>
+                    <Pressable style={{width:'80%' ,position:'absolute', backgroundColor:'white', 
+                          marginLeft:10,paddingHorizontal: 5, paddingVertical:8,
+                           }} onPress={()=>{handleLabelChanges}}>
+                        <Text>{selectedLable}
+                    </Text>
+                    </Pressable>
+                </View>
 
                 <View style={{ marginVertical: 10, marginHorizontal: 30, marginTop: 30 }}>
                     <Button
