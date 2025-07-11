@@ -43,8 +43,24 @@ function App(): React.JSX.Element {
 
   const DrawerContent = () => {
     return (
-      <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Drawer Content</Text>
+      <View style={{ flex: 1, backgroundColor: 'white', paddingTop:100, paddingLeft:20}}>
+
+
+        <TouchableOpacity
+           onPress={() => drawerRef.current?.openDrawer()}
+            style={{ padding:8 }}>
+            <Text style={{ fontSize: 18 }}>Events</Text>
+         </TouchableOpacity>
+        <TouchableOpacity
+           onPress={() => drawerRef.current?.openDrawer()}
+            style={{ padding:8 }}>
+            <Text style={{ fontSize: 18 }}>Category</Text>
+         </TouchableOpacity>
+         <TouchableOpacity
+           onPress={() => drawerRef.current?.openDrawer()}
+            style={{ padding:8 }}>
+            <Text style={{ fontSize: 18 }}>Favorite</Text>
+         </TouchableOpacity>
       </View>
     )
   }

@@ -39,7 +39,7 @@ export function ModalAddPost(props) {
             if (post) {
                 setPostName(post.post_name);
                 setDesc(post.description);
-                setFavorite((post.favotite == 1) ? true : false);
+                setFavorite((post.favorite == 1) ? true : false);
                 setLabelId(post.label_id);
                 setLabel(post.label_name);
                 setSelectedValue(post.label_name);
@@ -222,23 +222,23 @@ export function ModalAddPost(props) {
                     </View>
                 </Pressable>
 
-                <Text style={{ fontSize: 12, paddingLeft: 5, marginTop: 10 }}>Label</Text>
+                <Text style={{ fontSize: 12, paddingLeft: 5, }}>Label</Text>
                 
-                <View style={{flex:1,justifyContent :'center'}}>
+                <View style={{flex:1,justifyContent :'center', marginTop:20}}>
                     <Dropdown
-                     style = {{padding:8,margin:5, borderWidth:1, borderColor: 'black', borderRadius:10}} 
-                     data={labelData}
-                     value={selectedLable}
-                     onFocus={() => setIsFocus(true)}
-                     onBlur={() => setIsFocus(false)}
-                     onChange={handleLabelChanges } 
-                     placeholder={!isFocus ? 'Select item' : '...'}
-                     labelField={"label"} 
-                     valueField={"value"}
-                     renderItem={renderItem} >
+                        style = {{paddingHorizontal:5, paddingVertical:17, margin:5, borderWidth:1, borderColor: 'black', borderRadius:10}} 
+                        data={labelData}
+                        value={selectedLable}
+                        onFocus={() => setIsFocus(true)}
+                        onBlur={() => setIsFocus(false)}
+                        onChange={handleLabelChanges } 
+                        placeholder={!isFocus ? 'Select item' : '...'}
+                        labelField={"label"} 
+                        valueField={"value"}
+                        renderItem={renderItem} >
                     </Dropdown>
-                    <Pressable style={{width:'80%' ,position:'absolute', backgroundColor:'white', 
-                          marginLeft:10,paddingHorizontal: 5, paddingVertical:8,
+                    <Pressable style={{width:'80%', position:'absolute', backgroundColor:'white', 
+                          marginLeft:10,paddingHorizontal: 5, paddingVertical:2,
                            }} onPress={()=>{handleLabelChanges}}>
                         <Text>{selectedLable}
                     </Text>
