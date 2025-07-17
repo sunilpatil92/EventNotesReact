@@ -92,5 +92,14 @@ export default StyleSheet.create({
     color: 'green', // Change this to your desired color
     fontWeight: 'bold',
   },
+  tabsItem: {
+        height: 35,
+        justifyContent: 'center',
+        paddingHorizontal:15,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'black',
+        margin: 3,
+    },
 
 })

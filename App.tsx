@@ -8,10 +8,12 @@ import { HOME_SCREEN, HOME_TAB_TRACK, LOGIN_SCREEN, POST_DETAIL_SCREEN, POSTS_SC
 import PostListScreen from './src/screens/PostListScreen';
 import PostDetailScreen from './src/screens/PostDetailScreen';
 import ReminderFormScreen from './src/screens/ReminderFormScreen';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { DrawerLayout } from 'react-native-gesture-handler';
 import { useAuth } from './src/context/AuthContext';
 import ProfileScreen from './src/screens/ProfileScreen';
+import CategoryScreen from './src/screens/CategoryScreen';
+import FavoriteScreen from './src/screens/FavoriteScreen';
 
 function App(): React.JSX.Element {
 
@@ -21,8 +23,6 @@ function App(): React.JSX.Element {
   const { isLogin } = useAuth()
 
 
-  const CategoryScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Category</Text></View>) }
-  const FavoriteScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>Favorite</Text></View>) }
   const AboutScreen = () => { return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><Text>About</Text></View>) }
 
   const HomeTab = () => {
@@ -43,27 +43,55 @@ function App(): React.JSX.Element {
 
   const DrawerContent = () => {
     return (
-      <View style={{ flex: 1, backgroundColor: 'white', paddingTop:100, paddingLeft:20}}>
+      <View style={{flexDirection:'column', flex: 1, backgroundColor: 'white'}}>
 
+        <View style={{justifyContent:'flex-end',flexDirection: 'column', alignItems: 'center', backgroundColor:'#7123edff', height:'200', width:'100%' }}>
+          <Text style={{fontSize: 30, marginBottom:'50', color:'white' }}>Event Notes</Text>
+        </View>
 
-        <TouchableOpacity
-           onPress={() => drawerRef.current?.openDrawer()}
+        <View style={{paddingLeft:20}}>
+          <TouchableOpacity
+           onPress={() =>{
+            drawerRef.current.closeDrawer()
+            checkStackRoute()
+            navigationRef.navigate(HOME_TAB_TRACK)
+           }}
             style={{ padding:8 }}>
             <Text style={{ fontSize: 18 }}>Events</Text>
          </TouchableOpacity>
         <TouchableOpacity
-           onPress={() => drawerRef.current?.openDrawer()}
+           onPress={() =>{
+            drawerRef.current.closeDrawer()
+            checkStackRoute()
+            navigationRef.navigate(CATEGORY_SCREEN)
+           }}
             style={{ padding:8 }}>
             <Text style={{ fontSize: 18 }}>Category</Text>
          </TouchableOpacity>
          <TouchableOpacity
-           onPress={() => drawerRef.current?.openDrawer()}
+           onPress={() =>{
+            drawerRef.current.closeDrawer()
+             checkStackRoute()
+            navigationRef.navigate(FAVORITE_SCREEN)
+           }}
             style={{ padding:8 }}>
             <Text style={{ fontSize: 18 }}>Favorite</Text>
          </TouchableOpacity>
+        </View>
+
+        
       </View>
     )
   }
+
+ function checkStackRoute(){
+    const currentRoute = navigationRef.getCurrentRoute();
+    if (currentRoute?.name == CALENDER_SCREEN || currentRoute?.name == PROFILE_SCREEN) {
+      navigationRef.navigate(HOME_TAB_TRACK);
+      return true; // prevent default
+    }
+  }
+
   const MenuTabButton = () => (
     <TouchableOpacity
       onPress={() => drawerRef.current?.openDrawer()}
